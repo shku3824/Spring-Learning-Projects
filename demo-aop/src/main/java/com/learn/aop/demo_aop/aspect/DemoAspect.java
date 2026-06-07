@@ -1,6 +1,8 @@
 package com.learn.aop.demo_aop.aspect;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
@@ -25,14 +27,32 @@ import org.springframework.stereotype.Component;
 @Component
 public class DemoAspect {
 
-	@Before("execution(* com.learn.aop.demo_aop..*.*(..))")
-	public void beforeAnyMethodExecution(JoinPoint joinPoint) {
-		System.out.println("Inside beforeAnyMethodExecution for method "+joinPoint.getSignature());
-	}
+	//@Before("execution(* com.learn.aop.demo_aop..*.*(..))")
+	//public void beforeAnyMethodExecution(JoinPoint joinPoint) {
+		//System.out.println("Inside beforeAnyMethodExecution for method "+joinPoint.getSignature());
+	//}
 	
 	@Before("execution(* com.learn.aop.demo_aop.service.OrderService.processPayment(String))")
 	public void beforeOrderPaymentMethodExecution(JoinPoint joinPoint) {
 		System.out.println("Inside beforeOrderPaymentMethodExecution for method "+joinPoint.getSignature());
 	}
+	
+	@Around("@annotation(TrackExecutionTime)")
+	public Object trackExecutionTimeForMethod(ProceedingJoinPoint joinPoint) throws Throwable {
+		
+		long startTime = System.currentTimeMillis();
+
+        // Execute the actual method
+        Object proceed = joinPoint.proceed();
+
+        long timeTaken = System.currentTimeMillis() - startTime;
+
+        // Log the results
+        System.out.println("Method [" + joinPoint.getSignature() + 
+                           "] executed in " + timeTaken + " ms");
+
+        return proceed;
+	}
+	
 	
 }
